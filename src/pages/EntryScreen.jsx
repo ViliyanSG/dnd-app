@@ -1,19 +1,23 @@
 import { useState } from 'react'
 import { useRoom } from '../context/RoomContext'
+import { getSavedCharacters } from '../context/RoomContext'
 import './EntryScreen.css'
 
 export default function EntryScreen() {
-  const { createRoom, joinRoom, rejoinRoom, loading, error } = useRoom()
+  const { createRoom, joinRoom, joinWithSavedCharacter, rejoinRoom, loading, error } = useRoom()
 
-  const [mode, setMode]             = useState(null)  // null | 'dm' | 'dm-new' | 'dm-rejoin' | 'player'
+  // null | 'dm' | 'dm-new' | 'dm-rejoin' | 'player-code' | 'player-select' | 'player-new'
+  const [mode, setMode]             = useState(null)
   const [dmName, setDmName]         = useState('')
   const [rejoinCode, setRejoinCode] = useState('')
   const [playerName, setPlayerName] = useState('')
   const [roomCode, setRoomCode]     = useState('')
+  const [savedChars, setSavedChars] = useState([])
   const [localError, setLocalError] = useState('')
 
   const back = (to = null) => { setMode(to); setLocalError('') }
 
+  // ── DM handlers ──────────────────────────────────────────
   const handleDMCreate = async () => {
     if (!dmName.trim()) { setLocalError('Enter your name'); return }
     setLocalError('')
@@ -27,9 +31,29 @@ export default function EntryScreen() {
     if (!result) setLocalError('Room not found — check the code')
   }
 
-  const handlePlayerEnter = async () => {
+  // ── Player: step 1 — enter room code ─────────────────────
+  const handleCodeSubmit = () => {
+    if (!roomCode.trim()) { setLocalError('Enter the room code'); return }
+    setLocalError('')
+    const chars = getSavedCharacters(roomCode.trim())
+    if (chars.length > 0) {
+      setSavedChars(chars)
+      setMode('player-select')
+    } else {
+      setMode('player-new')
+    }
+  }
+
+  // ── Player: pick a saved character ───────────────────────
+  const handlePickSaved = async (char) => {
+    setLocalError('')
+    const result = await joinWithSavedCharacter(roomCode.trim(), char)
+    if (!result) setLocalError('Invalid code or room not found')
+  }
+
+  // ── Player: join as new character ────────────────────────
+  const handleNewCharacter = async () => {
     if (!playerName.trim()) { setLocalError('Enter your name'); return }
-    if (!roomCode.trim())   { setLocalError('Enter the room code'); return }
     setLocalError('')
     const result = await joinRoom(roomCode.trim(), playerName.trim())
     if (!result) setLocalError('Invalid code or room not found')
@@ -60,7 +84,7 @@ export default function EntryScreen() {
                 <span className="role-title">Dungeon Master</span>
                 <span className="role-desc">Create or rejoin a session</span>
               </button>
-              <button className="entry-role-btn player-btn" onClick={() => setMode('player')}>
+              <button className="entry-role-btn player-btn" onClick={() => setMode('player-code')}>
                 <span className="role-icon">🎲</span>
                 <span className="role-title">Player</span>
                 <span className="role-desc">Join a room with a code from the DM</span>
@@ -144,21 +168,10 @@ export default function EntryScreen() {
           </div>
         )}
 
-        {/* ── Player ── */}
-        {mode === 'player' && (
+        {/* ── Player: step 1 — enter room code ── */}
+        {mode === 'player-code' && (
           <div className="entry-form panel">
-            <div className="section-header">Player — Join Room</div>
-            <div className="form-field">
-              <label>Your name</label>
-              <input
-                type="text"
-                placeholder="e.g. Aragorn of the Dúnedain..."
-                value={playerName}
-                onChange={e => setPlayerName(e.target.value)}
-                maxLength={40}
-                autoFocus
-              />
-            </div>
+            <div className="section-header">Player — Enter Room Code</div>
             <div className="form-field">
               <label>Room Code</label>
               <input
@@ -166,17 +179,96 @@ export default function EntryScreen() {
                 placeholder="e.g. AB3X7K"
                 value={roomCode}
                 onChange={e => setRoomCode(e.target.value.toUpperCase())}
-                onKeyDown={e => e.key === 'Enter' && handlePlayerEnter()}
+                onKeyDown={e => e.key === 'Enter' && handleCodeSubmit()}
                 maxLength={6}
                 className="code-input"
+                autoFocus
+              />
+            </div>
+            {localError && <p className="entry-error">⚠ {localError}</p>}
+            <div className="form-actions">
+              <button className="btn btn-lg" onClick={handleCodeSubmit} disabled={loading}>
+                Continue
+              </button>
+              <button className="btn btn-ghost btn-sm" onClick={() => back()}>Back</button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Player: step 2 — pick saved character or create new ── */}
+        {mode === 'player-select' && (
+          <div className="entry-form panel">
+            <div className="section-header">Choose Your Character</div>
+            <p className="entry-choose-text" style={{ marginBottom: '16px' }}>
+              Room <strong style={{ color: 'var(--gold-light)', letterSpacing: '0.2em' }}>{roomCode}</strong>
+            </p>
+            <div className="saved-chars-list">
+              {savedChars.map((char) => (
+                <button
+                  key={char.player_name}
+                  className="saved-char-card"
+                  onClick={() => handlePickSaved(char)}
+                  disabled={loading}
+                >
+                  <div className="saved-char-name">
+                    {char.character_name || char.player_name}
+                  </div>
+                  <div className="saved-char-meta">
+                    <span className="saved-char-player">Player: {char.player_name}</span>
+                    {char.character_data?.class && (
+                      <span className="saved-char-class">
+                        {char.character_data.class}
+                        {char.character_data?.level ? ` Lv.${char.character_data.level}` : ''}
+                      </span>
+                    )}
+                    <span className="saved-char-hp">HP {char.hp}/{char.max_hp}</span>
+                  </div>
+                </button>
+              ))}
+              <button
+                className="saved-char-card saved-char-new"
+                onClick={() => setMode('player-new')}
+              >
+                <div className="saved-char-name">+ New Character</div>
+                <div className="saved-char-meta">
+                  <span className="saved-char-player">Start fresh</span>
+                </div>
+              </button>
+            </div>
+            {(localError || error) && <p className="entry-error">⚠ {localError || error}</p>}
+            <div className="form-actions" style={{ marginTop: '12px' }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => back('player-code')}>Back</button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Player: new character name ── */}
+        {mode === 'player-new' && (
+          <div className="entry-form panel">
+            <div className="section-header">Player — New Character</div>
+            <div className="form-field">
+              <label>Your name</label>
+              <input
+                type="text"
+                placeholder="e.g. Aragorn of the Dúnedain..."
+                value={playerName}
+                onChange={e => setPlayerName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleNewCharacter()}
+                maxLength={40}
+                autoFocus
               />
             </div>
             {(localError || error) && <p className="entry-error">⚠ {localError || error}</p>}
             <div className="form-actions">
-              <button className="btn btn-lg" onClick={handlePlayerEnter} disabled={loading}>
+              <button className="btn btn-lg" onClick={handleNewCharacter} disabled={loading}>
                 {loading ? 'Joining...' : 'Join Room'}
               </button>
-              <button className="btn btn-ghost btn-sm" onClick={() => back()}>Back</button>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => back(savedChars.length > 0 ? 'player-select' : 'player-code')}
+              >
+                Back
+              </button>
             </div>
           </div>
         )}
