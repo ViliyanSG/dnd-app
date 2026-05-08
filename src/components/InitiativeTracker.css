@@ -3,7 +3,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 .init-header {
   display: flex;
@@ -29,8 +30,8 @@
   flex-direction: column;
   gap: 3px;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  max-height: 300px;
 }
 
 .init-entry {

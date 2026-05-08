@@ -145,25 +145,21 @@
   border-top: 1px solid var(--wood-mid);
 }
 
-/* Mobile: dice fixed to bottom edge of screen */
+/* Mobile: content fills top, dice glued to bottom */
 @media (max-width: 768px) {
   .player-content-area {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    padding-bottom: 220px; /* leave space for fixed dice panel */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   .player-dice-area {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
+    flex-shrink: 0;
     max-height: 52vh;
     overflow-y: auto;
     border-top: 2px solid var(--forest-mid);
     box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
-    background: linear-gradient(160deg, #271508 0%, #1a0e05 40%, #201208 70%, #1a0c05 100%);
   }
 }
 
@@ -180,7 +176,8 @@
   min-height: 0;
   overflow-y: auto;
   padding: 10px;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(5px); }
@@ -197,7 +194,7 @@
 }
 .player-map-panel .map-viewer { flex: 1; min-height: 0; }
 
-.player-init-panel   { max-width: 500px; margin: 0 auto; }
+.player-init-panel   { width: 100%; display: flex; flex-direction: column; }
 .player-books-panel  { max-width: 700px; margin: 0 auto; }
 
 .player-loading {

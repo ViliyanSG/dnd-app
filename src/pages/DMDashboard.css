@@ -193,14 +193,13 @@
     height: unset;
   }
 
-  /* Top wrapper — fills above the fixed dice panel */
+  /* Top wrapper — fills space above dice */
   .dm-panels-wrapper {
     flex: 1;
     min-height: 0;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    padding-bottom: 220px; /* leave space for fixed dice panel */
   }
 
   /* Active panel fills the wrapper */
@@ -210,18 +209,13 @@
     overflow: hidden;
   }
 
-  /* Dice — fixed to bottom edge of screen */
+  /* Dice — glued to bottom via flex */
   .dm-dice {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
+    flex-shrink: 0;
     max-height: 52vh;
     overflow-y: auto;
     border-top: 2px solid var(--crimson);
     box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
-    background: linear-gradient(160deg, #271508 0%, #1a0e05 40%, #201208 70%, #1a0c05 100%);
   }
 
   .dm-hidden-mobile { display: none !important; }
