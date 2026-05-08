@@ -207,22 +207,51 @@ export function RoomProvider({ children }) {
     return url
   }, [room, updateMap])
 
+  // ── Rejoin room as DM ─────────────────────────────────────
+  const rejoinRoom = useCallback(async (code) => {
+    setLoading(true); setError(null)
+    try {
+      const upperCode = code.toUpperCase()
+      if (isConfigured()) {
+        const { data: roomData, error: roomErr } = await supabase
+          .from('rooms').select('*').eq('code', upperCode).single()
+        if (roomErr) throw new Error('Room not found')
+        setRoom(roomData)
+      } else {
+        setRoom({ code: upperCode, map_url: null, map_config: { x: 0, y: 0, scale: 1 } })
+      }
+      setRole('dm')
+      localStorage.setItem('dnd_room', upperCode)
+      localStorage.setItem('dnd_role', 'dm')
+      return upperCode
+    } catch (e) {
+      setError(e.message)
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   // ── Leave room ────────────────────────────────────────────
-  const leaveRoom = useCallback(() => {
+  const leaveRoom = useCallback(async () => {
     if (channelRef.current) channelRef.current.unsubscribe()
+    // Delete player record so DM no longer sees them
+    if (role === 'player' && currentPlayer && isConfigured()) {
+      await supabase.from('room_players').delete().eq('id', currentPlayer.id)
+    }
     setRoom(null); setRole(null); setCurrentPlayer(null); setPlayers([]); setInitiative({ entries: [], current_index: 0 })
     localStorage.removeItem('dnd_room')
     localStorage.removeItem('dnd_role')
     localStorage.removeItem('dnd_player_id')
     localStorage.removeItem('dnd_player_name')
     localStorage.removeItem('dnd_dm_name')
-  }, [])
+  }, [role, currentPlayer])
 
   return (
     <RoomContext.Provider value={{
       room, role, currentPlayer, players, initiative,
       loading, error, modifierOf,
-      createRoom, joinRoom, leaveRoom,
+      createRoom, joinRoom, rejoinRoom, leaveRoom,
       updatePlayer, updateMyCharacter,
       updateMap, uploadMap, updateInitiative,
     }}>
