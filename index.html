@@ -24,9 +24,11 @@
 
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-        })
+        // Clear all caches and re-register fresh SW (fixes stale workbox caches)
+        caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => Promise.all(regs.map(r => r.unregister())))
+          .then(() => navigator.serviceWorker.register('/sw.js'))
       }
     </script>
   </head>
