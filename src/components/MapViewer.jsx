@@ -39,6 +39,19 @@ export default function MapViewer({ readonly = false }) {
     return () => el.removeEventListener('wheel', onWheel)
   }, [onWheel])
 
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    el.addEventListener('touchstart', onTouchStart, { passive: false })
+    el.addEventListener('touchmove',  onTouchMove,  { passive: false })
+    el.addEventListener('touchend',   onTouchEnd,   { passive: false })
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove',  onTouchMove)
+      el.removeEventListener('touchend',   onTouchEnd)
+    }
+  }, [onTouchStart, onTouchMove, onTouchEnd])
+
   // Mouse drag to pan
   const onMouseDown = (e) => {
     if (e.button !== 0) return
@@ -61,24 +74,77 @@ export default function MapViewer({ readonly = false }) {
     }
   }, [isDragging, readonly, updateMap])
 
-  // Touch support
-  const touchRef = useRef(null)
-  const onTouchStart = (e) => {
+  // Touch support (pan + pinch-to-zoom)
+  const touchRef = useRef(null) // { type: 'pan'|'pinch', ... }
+
+  const getTouchDist = (t1, t2) =>
+    Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
+  const getTouchMid = (t1, t2) => ({
+    x: (t1.clientX + t2.clientX) / 2,
+    y: (t1.clientY + t2.clientY) / 2,
+  })
+
+  const onTouchStart = useCallback((e) => {
+    e.preventDefault()
     if (e.touches.length === 1) {
-      touchRef.current = { x: e.touches[0].clientX - transform.x, y: e.touches[0].clientY - transform.y }
+      touchRef.current = {
+        type: 'pan',
+        startX: e.touches[0].clientX - transform.x,
+        startY: e.touches[0].clientY - transform.y,
+      }
+    } else if (e.touches.length === 2) {
+      touchRef.current = {
+        type: 'pinch',
+        dist: getTouchDist(e.touches[0], e.touches[1]),
+        mid:  getTouchMid(e.touches[0], e.touches[1]),
+        startScale: transform.scale,
+        startX: transform.x,
+        startY: transform.y,
+      }
     }
-  }
-  const onTouchMove = (e) => {
-    if (e.touches.length === 1 && touchRef.current) {
-      const x = e.touches[0].clientX - touchRef.current.x
-      const y = e.touches[0].clientY - touchRef.current.y
+  }, [transform])
+
+  const onTouchMove = useCallback((e) => {
+    e.preventDefault()
+    const ref = touchRef.current
+    if (!ref) return
+
+    if (ref.type === 'pan' && e.touches.length === 1) {
+      const x = e.touches[0].clientX - ref.startX
+      const y = e.touches[0].clientY - ref.startY
       setTransform(t => ({ ...t, x, y }))
+    } else if (ref.type === 'pinch' && e.touches.length === 2) {
+      const newDist  = getTouchDist(e.touches[0], e.touches[1])
+      const newMid   = getTouchMid(e.touches[0], e.touches[1])
+      const ratio    = newDist / ref.dist
+      const newScale = Math.min(10, Math.max(0.1, ref.startScale * ratio))
+
+      // Zoom toward the pinch midpoint
+      const dx = newMid.x - ref.mid.x
+      const dy = newMid.y - ref.mid.y
+      const x  = ref.startX + dx + (newMid.x - ref.mid.x) * (1 - ratio)
+      const y  = ref.startY + dy + (newMid.y - ref.mid.y) * (1 - ratio)
+      setTransform({ x, y, scale: newScale })
     }
-  }
-  const onTouchEnd = () => {
-    if (!readonly) setTransform(t => { updateMap(undefined, t); return t })
-    touchRef.current = null
-  }
+  }, [])
+
+  const onTouchEnd = useCallback((e) => {
+    e.preventDefault()
+    if (e.touches.length === 0) {
+      if (!readonly) setTransform(t => { updateMap(undefined, t); return t })
+      touchRef.current = null
+    } else if (e.touches.length === 1 && touchRef.current?.type === 'pinch') {
+      // Switched from pinch back to pan
+      setTransform(t => {
+        touchRef.current = {
+          type: 'pan',
+          startX: e.touches[0].clientX - t.x,
+          startY: e.touches[0].clientY - t.y,
+        }
+        return t
+      })
+    }
+  }, [readonly, updateMap])
 
   // Reset view
   const resetView = () => {
@@ -158,9 +224,6 @@ export default function MapViewer({ readonly = false }) {
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
       >
         {mapUrl ? (
           <div
