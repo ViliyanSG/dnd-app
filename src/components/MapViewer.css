@@ -87,3 +87,32 @@
   text-transform: uppercase;
 }
 .map-placeholder-sub { font-size: 0.7rem !important; opacity: 0.6; }
+
+.map-zoom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 4px 0;
+}
+.map-zoom-btn {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--wood-mid);
+  border-radius: 4px;
+  color: var(--text-light);
+  font-size: 1.3rem;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.map-zoom-btn:hover {
+  background: rgba(180,100,20,0.2);
+  border-color: var(--gold-dark);
+  color: var(--gold-light);
+}

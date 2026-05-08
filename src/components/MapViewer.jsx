@@ -87,6 +87,13 @@ export default function MapViewer({ readonly = false }) {
     if (!readonly) updateMap(undefined, t)
   }
 
+  const zoomBy = (factor) => {
+    setTransform(t => {
+      const newScale = Math.min(10, Math.max(0.1, t.scale * factor))
+      return { ...t, scale: newScale }
+    })
+  }
+
   // Upload file
   const handleFileUpload = async (file) => {
     if (!file) return
@@ -118,7 +125,6 @@ export default function MapViewer({ readonly = false }) {
         <div className="section-header" style={{ marginBottom: 0 }}>Map</div>
         <div className="map-controls">
           <button className="btn btn-ghost btn-sm" onClick={resetView} title="Reset view">⊞ Reset</button>
-          <span className="map-zoom-val">{Math.round(transform.scale * 100)}%</span>
           {!readonly && (
             <>
               <button className="btn btn-sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
@@ -177,6 +183,12 @@ export default function MapViewer({ readonly = false }) {
             }
           </div>
         )}
+      </div>
+
+      <div className="map-zoom-bar">
+        <button className="map-zoom-btn" onClick={() => zoomBy(1.2)} title="Zoom in">＋</button>
+        <span className="map-zoom-val">{Math.round(transform.scale * 100)}%</span>
+        <button className="map-zoom-btn" onClick={() => zoomBy(1 / 1.2)} title="Zoom out">－</button>
       </div>
     </div>
   )
