@@ -1,0 +1,121 @@
+.player-card {
+  padding: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.player-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--crimson-mid) !important;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.7), 0 0 12px rgba(180,20,20,0.15) !important;
+}
+
+.pc-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid rgba(120,60,20,0.3);
+  padding-bottom: 7px;
+}
+.pc-name {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold-mid);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 8px rgba(180,130,20,0.3);
+}
+.pc-player-name {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--text-mid);
+  font-style: italic;
+}
+
+.pc-hp-section { display: flex; flex-direction: column; gap: 4px; }
+.pc-hp-text    { display: flex; align-items: baseline; gap: 6px; }
+.pc-hp-label {
+  font-family: var(--font-heading);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+.pc-hp-value {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+}
+.pc-hp-sep { color: var(--wood-light); font-size: 0.8rem; }
+
+.pc-ac {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pc-ac-icon  { font-size: 0.9rem; opacity: 0.8; }
+.pc-ac-val   { font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: var(--text-bright); }
+.pc-ac-label {
+  font-family: var(--font-heading);
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.pc-stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 3px;
+}
+.pc-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(80,40,10,0.5);
+  border-radius: 3px;
+  padding: 3px 2px;
+  transition: border-color 0.15s;
+}
+.player-card:hover .pc-stat { border-color: rgba(160,80,20,0.4); }
+.pc-stat-label {
+  font-family: var(--font-heading);
+  font-size: 0.52rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  letter-spacing: 0.04em;
+}
+.pc-stat-score {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.1;
+}
+.pc-stat-mod {
+  font-family: var(--font-heading);
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--crimson-glow);
+}
+
+.pc-click-hint {
+  font-family: var(--font-heading);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold-dark);
+  text-align: right;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.player-card:hover .pc-click-hint { opacity: 0.8; }

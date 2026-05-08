@@ -1,0 +1,89 @@
+.map-viewer {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;   /* allow shrinking in flex */
+  flex: 1;
+}
+.map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.map-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.map-zoom-val {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-mid);
+  min-width: 38px;
+  text-align: center;
+}
+.map-url-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+}
+.map-url-row input { flex: 1; font-size: 0.82rem !important; padding: 5px 8px !important; }
+
+.map-canvas {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--wood-mid);
+  border-radius: 3px;
+  cursor: grab;
+  min-height: 240px;
+  background:
+    repeating-linear-gradient(0deg,  transparent, transparent 39px, rgba(160,100,40,0.04) 39px, rgba(160,100,40,0.04) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(160,100,40,0.04) 39px, rgba(160,100,40,0.04) 40px),
+    #0e0804;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+}
+.map-canvas.dragging { cursor: grabbing; }
+
+.map-image-wrapper {
+  position: absolute;
+  top: 0; left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.map-image {
+  display: block;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+  box-shadow: 0 0 30px rgba(0,0,0,0.8);
+}
+
+.map-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-dim);
+  opacity: 0.4;
+  pointer-events: none;
+}
+.map-placeholder p:first-child { font-size: 2.5rem; }
+.map-placeholder p {
+  font-family: var(--font-heading);
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.map-placeholder-sub { font-size: 0.7rem !important; opacity: 0.6; }
