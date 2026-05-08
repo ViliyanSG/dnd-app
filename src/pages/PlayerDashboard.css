@@ -145,21 +145,26 @@
   border-top: 1px solid var(--wood-mid);
 }
 
-/* Mobile: content fills top, dice glued to bottom */
+/* Mobile: whole main scrolls, content + dice stack vertically */
 @media (max-width: 768px) {
+  .player-main {
+    overflow-y: auto;
+    display: block;
+  }
   .player-content-area {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
+    min-height: 58vh;
     display: flex;
     flex-direction: column;
   }
   .player-dice-area {
-    flex-shrink: 0;
-    max-height: 52vh;
-    overflow-y: auto;
     border-top: 2px solid var(--forest-mid);
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+  }
+  /* Map panel needs explicit height so the canvas is usable */
+  .player-map-panel {
+    min-height: 58vh;
+  }
+  .player-init-panel {
+    min-height: 58vh;
   }
 }
 

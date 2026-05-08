@@ -179,13 +179,9 @@
   .dm-mobile-tabs { display: flex; }
 
   .dm-main {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
+    display: block;
+    overflow-y: auto;
     padding: 6px;
-    gap: 6px;
-    overflow: hidden;
     /* reset desktop grid */
     grid-template-columns: unset;
     grid-template-rows: unset;
@@ -193,11 +189,9 @@
     height: unset;
   }
 
-  /* Top wrapper — fills space above dice */
+  /* Top wrapper — min height so content is always usable */
   .dm-panels-wrapper {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
+    min-height: 58vh;
     display: flex;
     flex-direction: column;
   }
@@ -209,13 +203,10 @@
     overflow: hidden;
   }
 
-  /* Dice — glued to bottom via flex */
+  /* Dice — sits naturally below content, no max-height cap */
   .dm-dice {
-    flex-shrink: 0;
-    max-height: 52vh;
-    overflow-y: auto;
+    overflow: visible;
     border-top: 2px solid var(--crimson);
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
   }
 
   .dm-hidden-mobile { display: none !important; }
