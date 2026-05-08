@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#3d0808"/>
+      <stop offset="100%" stop-color="#0d0202"/>
+    </radialGradient>
+    <radialGradient id="face" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#5a1010"/>
+      <stop offset="100%" stop-color="#2a0404"/>
+    </radialGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="96" cy="96" r="90" fill="url(#bg)" stroke="#8b1a1a" stroke-width="3"/>
+  <!-- D20 shape (icosahedron face) -->
+  <!-- Outer pentagon/icosahedron outline -->
+  <polygon points="96,22 163,65 163,127 96,170 29,127 29,65"
+           fill="url(#face)" stroke="#c8a028" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Inner triangle lines (d20 face pattern) -->
+  <polygon points="96,38 148,118 44,118"
+           fill="none" stroke="#e8c040" stroke-width="1.8" stroke-linejoin="round" opacity="0.85"/>
+  <!-- Left upper triangle -->
+  <line x1="29" y1="65" x2="96" y2="38" stroke="#e8c040" stroke-width="1.5" opacity="0.6"/>
+  <line x1="29" y1="127" x2="44" y2="118" stroke="#e8c040" stroke-width="1.5" opacity="0.6"/>
+  <line x1="96" y1="170" x2="44" y2="118" stroke="#e8c040" stroke-width="1.5" opacity="0.6"/>
+  <line x1="163" y1="65" x2="96" y2="38" stroke="#e8c040" stroke-width="1.5" opacity="0.6"/>
+  <line x1="163" y1="127" x2="148" y2="118" stroke="#e8c040" stroke-width="1.5" opacity="0.6"/>
+  <line x1="96" y1="170" x2="148" y2="118" stroke="#e8c040" stroke-width="1.5" opacity="0.6"/>
+  <!-- "20" text -->
+  <text x="96" y="95" font-family="Georgia, serif" font-size="42" font-weight="900"
+        fill="#f5e070" text-anchor="middle" dominant-baseline="central"
+        filter="url(#glow)">20</text>
+  <defs>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>

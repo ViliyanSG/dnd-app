@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#3d0808"/>
+      <stop offset="100%" stop-color="#0d0202"/>
+    </radialGradient>
+    <radialGradient id="face" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#5a1010"/>
+      <stop offset="100%" stop-color="#2a0404"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="url(#bg)" stroke="#8b1a1a" stroke-width="8"/>
+  <polygon points="256,58 435,173 435,339 256,454 77,339 77,173"
+           fill="url(#face)" stroke="#c8a028" stroke-width="6" stroke-linejoin="round"/>
+  <polygon points="256,100 394,314 118,314"
+           fill="none" stroke="#e8c040" stroke-width="4.5" stroke-linejoin="round" opacity="0.85"/>
+  <line x1="77" y1="173" x2="256" y2="100" stroke="#e8c040" stroke-width="3.5" opacity="0.6"/>
+  <line x1="77" y1="339" x2="118" y2="314" stroke="#e8c040" stroke-width="3.5" opacity="0.6"/>
+  <line x1="256" y1="454" x2="118" y2="314" stroke="#e8c040" stroke-width="3.5" opacity="0.6"/>
+  <line x1="435" y1="173" x2="256" y2="100" stroke="#e8c040" stroke-width="3.5" opacity="0.6"/>
+  <line x1="435" y1="339" x2="394" y2="314" stroke="#e8c040" stroke-width="3.5" opacity="0.6"/>
+  <line x1="256" y1="454" x2="394" y2="314" stroke="#e8c040" stroke-width="3.5" opacity="0.6"/>
+  <text x="256" y="252" font-family="Georgia, serif" font-size="112" font-weight="900"
+        fill="#f5e070" text-anchor="middle" dominant-baseline="central"
+        filter="url(#glow)">20</text>
+</svg>
