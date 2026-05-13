@@ -4,20 +4,20 @@ import './DiceRoller.css'
 const DICE = [4, 6, 8, 10, 100, 12, 20]
 
 export default function DiceRoller() {
-  const [pool, setPool]       = useState({})    // { 4:0, 6:2, 8:0, ... }
+  const [pool, setPool]         = useState({})
   const [modifier, setModifier] = useState(0)
-  const [results, setResults] = useState(null)
-  const [rolling, setRolling] = useState(false)
+  const [results, setResults]   = useState(null)
+  const [rolling, setRolling]   = useState(false)
+  const [rerolling, setRerolling] = useState(null) // index being rerolled
 
-  const addDie   = (d) => setPool(p => ({ ...p, [d]: (p[d] || 0) + 1 }))
-  const removeDie= (d) => setPool(p => ({ ...p, [d]: Math.max(0, (p[d] || 0) - 1) }))
-  const clearPool= () => { setPool({}); setResults(null); setModifier(0) }
+  const addDie    = (d) => setPool(p => ({ ...p, [d]: (p[d] || 0) + 1 }))
+  const removeDie = (d) => setPool(p => ({ ...p, [d]: Math.max(0, (p[d] || 0) - 1) }))
+  const clearPool = () => { setPool({}); setResults(null); setModifier(0) }
 
   const totalDice = Object.values(pool).reduce((s, n) => s + n, 0)
 
   const rollDie = (sides) => {
     if (sides === 100) {
-      // d100 = d10 (tens) + d10 (units)
       const tens  = Math.floor(Math.random() * 10) * 10
       const units = Math.floor(Math.random() * 10)
       return tens + units || 100
@@ -28,11 +28,9 @@ export default function DiceRoller() {
   const roll = useCallback(() => {
     if (totalDice === 0) return
     setRolling(true)
-
     setTimeout(() => {
       const rolls = []
       let total   = 0
-
       Object.entries(pool).forEach(([d, count]) => {
         const sides = parseInt(d)
         for (let i = 0; i < count; i++) {
@@ -41,12 +39,25 @@ export default function DiceRoller() {
           total += val
         }
       })
-
       total += modifier
       setResults({ rolls, total, modifier })
       setRolling(false)
     }, 400)
   }, [pool, modifier, totalDice])
+
+  const rerollSingle = useCallback((index) => {
+    setRerolling(index)
+    setTimeout(() => {
+      setResults(prev => {
+        const newRolls = prev.rolls.map((r, i) =>
+          i === index ? { die: r.die, value: rollDie(r.die), rerolled: true } : { ...r, rerolled: false }
+        )
+        const total = newRolls.reduce((s, r) => s + r.value, 0) + prev.modifier
+        return { ...prev, rolls: newRolls, total }
+      })
+      setRerolling(null)
+    }, 300)
+  }, [])
 
   const poolDescription = Object.entries(pool)
     .filter(([, n]) => n > 0)
@@ -115,14 +126,16 @@ export default function DiceRoller() {
         <div className="dice-results">
           <div className="dice-result-rolls">
             {results.rolls.map((r, i) => (
-              <span
+              <button
                 key={i}
-                className={`die-result-chip${r.value === r.die || (r.die === 100 && r.value === 100) ? ' nat-max' : ''}${r.value === 1 ? ' nat-one' : ''}`}
-                title={`d${r.die}`}
+                className={`die-result-chip die-result-chip--btn${r.value === r.die || (r.die === 100 && r.value === 100) ? ' nat-max' : ''}${r.value === 1 ? ' nat-one' : ''}${r.rerolled ? ' rerolled' : ''}${rerolling === i ? ' rerolling' : ''}`}
+                title={`Reroll d${r.die}`}
+                onClick={() => rerollSingle(i)}
               >
-                {r.value}
+                <span className="die-chip-value">{rerolling === i ? '…' : r.value}</span>
                 <sup>d{r.die}</sup>
-              </span>
+                <span className="die-reroll-icon">↺</span>
+              </button>
             ))}
             {results.modifier !== 0 && (
               <span className="die-result-mod">
